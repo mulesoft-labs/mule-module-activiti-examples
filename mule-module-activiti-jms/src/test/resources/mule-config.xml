@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule 
-    xmlns="http://www.mulesoft.org/schema/mule/core" 
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:activiti="http://www.mulesoft.org/schema/mule/activiti-embedded"
     xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
@@ -16,9 +15,11 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
     ">
 
+    <!-- JMS configuration -->
     <jms:activemq-connector name="jmsConnector" />
 
-    <activiti:connector name="actServer" version="5.5"
+    <!-- Activiti configuration -->
+    <activiti:connector name="activitiServer" version="5.5"
         repositoryService-ref="repositoryService"
         runtimeService-ref="runtimeService"
         taskService-ref="taskService"
@@ -42,6 +43,7 @@
     <spring:bean id="taskService" factory-bean="processEngine" factory-method="getTaskService" />
     <spring:bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService" />
 
+    <!-- Flows -->
     <flow name="create-process">
         <vm:inbound-endpoint path="in" exchange-pattern="request-response" />
         <activiti:create-process parametersExpression="#[header:INBOUND:createProcessParameters]" />
