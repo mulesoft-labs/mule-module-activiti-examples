@@ -1,0 +1,26 @@
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="processOrder" >
+
+    <startEvent id="theStart" />
+    
+    <sequenceFlow sourceRef="theStart" targetRef="waitState" />
+    
+    <!-- Wait till somebody approves the order. For now expect somebody will set approvedBy and signal this process -->
+    <receiveTask id="waitState" />
+
+    <sequenceFlow sourceRef="waitState" targetRef="waitState2" />
+
+    <!-- Just to check the status of the variable -->
+    <receiveTask id="waitState2" />
+
+    <sequenceFlow sourceRef="waitState2" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

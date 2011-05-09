@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule 
+    xmlns="http://www.mulesoft.org/schema/mule/core" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:activiti="http://www.mulesoft.org/schema/mule/activiti-embedded"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+    xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+        http://www.mulesoft.org/schema/mule/activiti-embedded http://www.mulesoft.org/schema/mule/activiti-embedded/3.2/mule-activiti-embedded.xsd
+        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.1/mule-scripting.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.1/mule-jms.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    ">
+
+    <jms:activemq-connector name="jmsConnector" />
+
+    <activiti:connector name="actServer" version="5.5"
+        repositoryService-ref="repositoryService"
+        runtimeService-ref="runtimeService"
+        taskService-ref="taskService"
+        historyService-ref="historyService" />
+        
+    <spring:bean id="processEngineConfiguration" class="org.activiti.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+    	<spring:property name="jdbcUrl" value="jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000" />
+    	<spring:property name="jdbcDriver" value="org.h2.Driver" />
+    	<spring:property name="jdbcUsername" value="sa" />
+    	<spring:property name="jdbcPassword" value="" />
+        <spring:property name="databaseSchemaUpdate" value="true" />
+        <spring:property name="jobExecutorActivate" value="false" />
+    </spring:bean>
+
+    <spring:bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
+        <spring:property name="processEngineConfiguration" ref="processEngineConfiguration" />
+    </spring:bean>
+
+    <spring:bean id="repositoryService" factory-bean="processEngine" factory-method="getRepositoryService" />
+    <spring:bean id="runtimeService" factory-bean="processEngine" factory-method="getRuntimeService" />
+    <spring:bean id="taskService" factory-bean="processEngine" factory-method="getTaskService" />
+    <spring:bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService" />
+
+    <flow name="create-process">
+        <vm:inbound-endpoint path="in" exchange-pattern="request-response" />
+        <activiti:create-process parametersExpression="#[header:INBOUND:createProcessParameters]" />
+    </flow>
+
+    <flow name="approve-flow">
+        <jms:inbound-endpoint queue="approveQueue" />
+        <activiti:set-variable executionIdExpression="#[groovy:payload.id]" 
+            variableExpression="#[string:approvedBy]" valueExpression="#[header:INBOUND:username]" />
+        <activiti:signal executionIdExpression="#[groovy:payload.id]" />
+    </flow>
+</mule>
