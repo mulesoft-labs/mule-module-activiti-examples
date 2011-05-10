@@ -1,0 +1,35 @@
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="processOrderWithTweetPublish" >
+
+    <startEvent id="theStart" />
+    
+    <sequenceFlow sourceRef="theStart" targetRef="processOrderAndTweet" />
+    
+    <sendTask id="processOrderAndTweet" activiti:type="mule">
+      <extensionElements>
+        <activiti:field name="endpointUrl">
+          <activiti:string>vm://tweetFromActiviti</activiti:string>
+        </activiti:field>
+        <activiti:field name="language">
+          <activiti:string>juel</activiti:string>
+        </activiti:field>
+        <activiti:field name="payloadExpression">
+          <activiti:string>I have just purchased a #{productName} from Mulesoft.com</activiti:string>
+        </activiti:field>
+        <activiti:field name="resultVariable">
+          <activiti:string>theVariable</activiti:string>
+        </activiti:field>
+      </extensionElements>
+    </sendTask>
+    
+    <sequenceFlow sourceRef="processOrderAndTweet" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>
