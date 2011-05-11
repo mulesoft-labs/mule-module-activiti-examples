@@ -17,7 +17,6 @@ import org.mule.api.transport.PropertyScope;
 
 public class SplitAndSetFieldsProcessor implements MessageProcessor
 {
-
     private static String[] fields = new String[] {"FirstName", "LastName", "Email", "Title", "Phone"};
     
     public MuleEvent process(MuleEvent event) throws MuleException
@@ -31,7 +30,6 @@ public class SplitAndSetFieldsProcessor implements MessageProcessor
         
         return event;
     }
-
 }
 
 
