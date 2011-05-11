@@ -1,0 +1,35 @@
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="processLead" >
+
+    <startEvent id="theStart" />
+    
+    <sequenceFlow sourceRef="theStart" targetRef="createSalesforceContact" />
+    
+    <sendTask id="createSalesforceContact" activiti:type="mule">
+      <extensionElements>
+        <activiti:field name="endpointUrl">
+          <activiti:string>vm://createSalesforceContactFromActiviti</activiti:string>
+        </activiti:field>
+        <activiti:field name="language">
+          <activiti:string>juel</activiti:string>
+        </activiti:field>
+        <activiti:field name="payloadExpression">
+          <activiti:string>#{firstName},#{lastName},#{email},#{title},#{phone}</activiti:string>
+        </activiti:field>
+        <activiti:field name="resultVariable">
+          <activiti:string>theVariable</activiti:string>
+        </activiti:field>
+      </extensionElements>
+    </sendTask>
+    
+    <sequenceFlow sourceRef="createSalesforceContact" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>
