@@ -11,7 +11,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <mule.version>3.1.0</mule.version>
+        <mule.version>3.6.0</mule.version>
         <activiti.version>5.5</activiti.version>
         <mule.activiti.version>3.2.1</mule.activiti.version>
     </properties>
